@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Bus Scheduling and Route Management System</title>
+    <style>
+        /* Enhanced styling for usability and clarity */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 450px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .role-container {
+            width: 85%;
+            margin: 50px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .role-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .map-placeholder {
+            height: 350px;
+            background-color: #e9ecef;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 20px;
+            border-radius: 5px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .form-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-inline > div {
+            flex: 1;
+        }
+        .form-inline > div:not(:last-child) {
+            margin-right: 15px;
+        }
+        .user-list {
+            margin-top: 20px;
+        }
+        .user-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .user-list li {
+            padding: 8px;
+            background-color: #f1f1f1;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Page -->
+    <div class="container" id="login-container">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="loginId">Login ID</label>
+            <input type="text" id="loginId" name="loginId" minlength="8" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" name="role">
+                <option value="bus-scheduler">Bus Scheduler</option>
+                <option value="crew">Crew</option>
+                <option value="administrator">Administrator</option>
+                <option value="route-planner">Route Planner</option>
+                <option value="passenger">Passenger</option>
+            </select>
+        </div>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <!-- Administrator Page -->
+    <div class="role-container hidden" id="administrator-page">
+        <h2 class="role-header">Administrator - Add New User</h2>
+        <div class="form-group">
+            <label for="newName">Name</label>
+            <input type="text" id="newName">
+        </div>
+        <div class="form-group">
+            <label for="newLoginId">Login ID</label>
+            <input type="text" id="newLoginId" minlength="8">
+        </div>
+        <div class="form-group">
+            <label for="newPassword">Password</label>
+            <input type="password" id="newPassword">
+        </div>
+        <div class="form-group">
+            <label for="newRole">Role</label>
+            <select id="newRole">
+                <option value="bus-scheduler">Bus Scheduler</option>
+                <option value="crew">Crew</option>
+                <option value="administrator">Administrator</option>
+                <option value="route-planner">Route Planner</option>
+                <option value="passenger">Passenger</option>
+            </select>
+        </div>
+        <button onclick="addUser()">Add User</button>
+        <div class="user-list">
+            <h3>Current Users</h3>
+            <ul id="userList">
+                <!-- Users will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bus Scheduler Page -->
+    <div class="role-container hidden" id="bus-scheduler-page">
+        <h2 class="role-header">Bus Scheduler</h2>
+        <div class="button-group">
+            <button onclick="showLinkedDuty()">Linked Duty Scheduling</button>
+            <button onclick="showUnlinkedDuty()">Unlinked Duty Scheduling</button>
+        </div>
+
+        <!-- Linked Duty Scheduling Section -->
+        <div class="hidden" id="linked-duty-section">
+            <h3>Linked Duty Scheduling</h3>
+            <div class="form-group">
+                <label for="selectCrew">Select Crew</label>
+                <select id="selectCrew">
+                    <option>John Doe</option>
+                    <option>Jane Smith</option>
+                    <option>Michael Brown</option>
+                    <option>Emily Davis</option>
+                    <option>David Wilson</option>
+                    <!-- Add more crew options here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="selectBus">Select Bus Number</label>
+                <select id="selectBus">
+                    <option>Bus 101</option>
+                    <option>Bus 102</option>
+                    <option>Bus 103</option>
+                    <option>Bus 104</option>
+                    <option>Bus 105</option>
+                    <!-- Add more bus numbers here -->
+                </select>
+            </div>
+            <div class="form-inline">
+                <div>
+                    <label for="timingsFrom">Timings From</label>
+                    <input type="time" id="timingsFrom">
+                </div>
+                <div>
+                    <label for="timingsTo">Timings To</label>
+                    <input type="time" id="timingsTo">
+                </div>
+            </div>
+            <div class="form-inline">
+                <div>
+                    <label for="breakFrom">Break Timings From</label>
+                    <input type="time" id="breakFrom">
+                </div>
+                <div>
+                    <label for="breakTo">Break Timings To</label>
+                    <input type="time" id="breakTo">
+                </div>
+            </div>
+            <button onclick="assignLinkedDuty()">Assign</button>
+        </div>
+
+        <!-- Unlinked Duty Scheduling Section -->
+        <div class="hidden" id="unlinked-duty-section">
+            <h3>Unlinked Duty Scheduling</h3>
+            <div class="form-group">
+                <label for="availableCrew">Available Crew</label>
+                <select id="availableCrew">
+                    <option>James Bond</option>
+                    <option>Sarah Connor</option>
+                    <option>Thomas Anderson</option>
+                    <option>Ellen Ripley</option>
+                    <option>Indiana Jones</option>
+                    <!-- Add more unassigned crew options here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="busesToSchedule">Number of Buses to be Scheduled</label>
+                <input type="number" id="busesToSchedule" min="1" max="10">
+            </div>
+            <!-- Dynamic bus and crew assignment options -->
+            <div id="unlinkedAssignments">
+                <div class="form-inline">
+                    <div>
+                        <label for="busNumber1">Bus Number</label>
+                        <select id="busNumber1">
+                            <option>Bus 106</option>
+                            <option>Bus 107</option>
+                            <option>Bus 108</option>
+                            <!-- Add more bus numbers here -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="timingFrom1">Timings From</label>
+                        <input type="time" id="timingFrom1">
+                    </div>
+                    <div>
+                        <label for="timingTo1">Timings To</label>
+                        <input type="time" id="timingTo1">
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <div>
+                        <label for="breakFrom1">Break Timings From</label>
+                        <input type="time" id="breakFrom1">
+                    </div>
+                    <div>
+                        <label for="breakTo1">Break Timings To</label>
+                        <input type="time" id="breakTo1">
+                    </div>
+                </div>
+            </div>
+            <button onclick="assignUnlinkedDuty()">Assign</button>
+        </div>
+    </div>
+
+    <!-- Route Planner Page -->
+    <div class="role-container hidden" id="route-planner-page">
+        <h2 class="role-header">Route Planner</h2>
+        <div class="form-group">
+            <label for="selectBusForRoute">Select Bus Number</label>
+            <select id="selectBusForRoute">
+                <option>Bus 101</option>
+                <option>Bus 102</option>
+                <option>Bus 103</option>
+                <option>Bus 104</option>
+                <option>Bus 105</option>
+                <!-- Add more bus numbers here -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="startPlace">Select Unassigned Start Place</label>
+            <input type="text" id="startPlace">
+        </div>
+        <div class="form-group">
+            <label for="destinationPlace">Select Unassigned Destination Place</label>
+            <input type="text" id="destinationPlace">
+        </div>
+        <div class="map-placeholder">Map Placeholder (Access to Draw Routes)</div>
+        <button onclick="submitRoute()">Submit</button>
+    </div>
+
+    <!-- Crew Page -->
+    <div class="role-container hidden" id="crew-page">
+        <h2 class="role-header">Crew</h2>
+        <div class="form-group">
+            <label>Assigned Bus Number: <span id="assignedBusNumber">Bus 101</span></label>
+        </div>
+        <div class="form-group">
+            <label>Assigned Start Point: <span id="assignedStartPoint">Depot A</span></label>
+        </div>
+        <div class="form-group">
+            <label>Assigned Destination Point: <span id="assignedDestinationPoint">Depot B</span></label>
+        </div>
+        <div class="form-group">
+            <label>Stop Points List:</label>
+            <ul id="stopPointsList">
+                <li>Stop 1</li>
+                <li>Stop 2</li>
+                <li>Stop 3</li>
+                <li>Stop 4</li>
+                <!-- Add more stops here -->
+            </ul>
+        </div>
+        <div class="map-placeholder">Map Placeholder (View Directions)</div>
+    </div>
+
+    <!-- Passenger Page -->
+    <div class="role-container hidden" id="passenger-page">
+        <h2 class="role-header">Passenger</h2>
+        <div class="form-group">
+            <label for="selectBusForTimetable">Select Bus Number</label>
+            <select id="selectBusForTimetable">
+                <option>Bus 101</option>
+                <option>Bus 102</option>
+                <option>Bus 103</option>
+                <option>Bus 104</option>
+                <option>Bus 105</option>
+                <!-- Add more bus numbers here -->
+            </select>
+        </div>
+        <button onclick="displayTimetable()">View Timetable</button>
+        <div id="timetableDisplay" class="hidden">
+            <!-- Timetable details will be dynamically inserted here -->
+            <p>Timetable for selected bus...</p>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const role = document.getElementById('role').value;
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById(role + '-page').classList.remove('hidden');
+        }
+
+        function addUser() {
+            const newName = document.getElementById('newName').value;
+            const newLoginId = document.getElementById('newLoginId').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const newRole = document.getElementById('newRole').value;
+
+            if (newName && newLoginId && newPassword && newRole) {
+                const userList = document.getElementById('userList');
+                const newUserItem = document.createElement('li');
+                newUserItem.textContent = `${newName} (${newRole}) - ${newLoginId}`;
+                userList.appendChild(newUserItem);
+
+                // Clear input fields after adding user
+                document.getElementById('newName').value = '';
+                document.getElementById('newLoginId').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('newRole').value = 'bus-scheduler';
+
+                alert("New user added successfully!");
+            } else {
+                alert("Please fill out all fields to add a new user.");
+            }
+        }
+
+        function showLinkedDuty() {
+            document.getElementById('linked-duty-section').classList.remove('hidden');
+            document.getElementById('unlinked-duty-section').classList.add('hidden');
+        }
+
+        function showUnlinkedDuty() {
+            document.getElementById('unlinked-duty-section').classList.remove('hidden');
+            document.getElementById('linked-duty-section').classList.add('hidden');
+        }
+
+        function assignLinkedDuty() {
+            alert("Linked duty assigned successfully!");
+        }
+
+        function assignUnlinkedDuty() {
+            alert("Unlinked duty assigned successfully!");
+        }
+
+        function submitRoute() {
+            alert("Route submitted successfully!");
+        }
+
+        function displayTimetable() {
+            document.getElementById('timetableDisplay').classList.remove('hidden');
+        }
+    </script>
+
+</body>
+</html>
